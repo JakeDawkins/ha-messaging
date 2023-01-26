@@ -6,24 +6,16 @@ import { useAuth } from '../utils/useAuth';
 import { Conversation } from '../types';
 import Layout from '../components/Layout';
 import ConversationComp from '../components/Conversation';
+import UserBoundary from '../components/UserBoundary';
 
 function _Home() {
   const { user } = useAuth();
-  const router = useRouter();
 
   const {
     data: conversations,
     isLoading,
     error,
   } = useSwr<Conversation[]>(user ? [`/cp/conversations/`, user] : null);
-
-  // todo pull out to helper
-  useEffect(() => {
-    if (!user) {
-      console.log('No user logged in, redirecting.');
-      router.push('/login');
-    }
-  }, [router, user]);
 
   if (isLoading)
     return (
@@ -52,8 +44,11 @@ function _Home() {
   );
 }
 
-// todo -- types
-// @ts-ignore
-// export default withUserBoundary({ Comp: _Home });
-
-export default _Home;
+function Home() {
+  return (
+    <UserBoundary>
+      <_Home />
+    </UserBoundary>
+  );
+}
+export default Home;

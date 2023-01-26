@@ -87,5 +87,6 @@ function useAuthProvider() {
     user,
     signIn,
     signout,
+    refreshAccessToken,
   };
 }

@@ -1,14 +1,13 @@
-import React, { useEffect, FC, useCallback, useState } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import useSwr from 'swr';
-import useSWRMutation from 'swr/mutation';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../utils/useAuth';
 import { sendMessage } from '../../utils/fetchers';
-import { BASE_URL } from '../../utils/constants';
 import { MessageResponse } from '../../types';
 import Message from '../../components/Message';
+import UserBoundary from '../../components/UserBoundary';
 
-function Conversation() {
+function _Conversation() {
   const { user } = useAuth();
   const router = useRouter();
   const customerId =
@@ -24,41 +23,13 @@ function Conversation() {
 
   const [inputMessage, setInputMessage] = useState('');
 
-  const { trigger: send } = useSWRMutation(SWRKey, sendMessage);
-
-  // const handleMessageSend = useCallback(async () => {
-  //   // send({ message: inputMessage, customerId });
-  //   return fetch(`${BASE_URL}/cp/messages/${customerId}/`, {
-  //     method: 'POST',
-  //     body: JSON.stringify({ message: inputMessage }),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `Bearer ${user.access}`,
-  //     },
-  //   })
-  //     .then((res) => {
-  //       if (res.ok) {
-  //         return res.json();
-  //       } else {
-  //         throw new Error('invalid response');
-  //       }
-  //     })
-  //     .then(() => {
-  //       setInputMessage('');
-  //       mutate();
-  //     })
-  //     .catch((e) => {
-  //       console.error(e);
-  //     });
-  // }, [send, inputMessage, customerId]);
-
-  // todo pull out to helper
-  useEffect(() => {
-    if (!user) {
-      console.log('No user logged in, redirecting.');
-      router.push('/login');
-    }
-  }, [router, user]);
+  const handleMessageSend = useCallback(() => {
+    mutate(
+      sendMessage({ user, message: inputMessage, customerId }).then((res) => {
+        return { ...data, messages: [...data.messages, res] };
+      }),
+    );
+  }, [mutate, user, inputMessage, customerId, data]);
 
   const onInputMessageChange = useCallback((e) => {
     if (!e?.target) return;
@@ -114,6 +85,14 @@ function Conversation() {
         </div>
       </div>
     </main>
+  );
+}
+
+function Conversation() {
+  return (
+    <UserBoundary>
+      <_Conversation />
+    </UserBoundary>
   );
 }
 export default Conversation;
