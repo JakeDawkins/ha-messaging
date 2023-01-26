@@ -1,12 +1,12 @@
 import React, { useEffect, FC } from 'react';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-
-import fetcher from '../utils/fetchers';
-import { useAuth } from '../utils/useAuth';
-import { withUserBoundary } from '../components/UserBoundary';
 import Link from 'next/link';
 import Image from 'next/image';
+import parseISO from 'date-fns/parseISO';
+
+import { useAuth } from '../utils/useAuth';
+import format from 'date-fns/format';
 
 interface Conversation {
   isActive: boolean;
@@ -61,22 +61,26 @@ function _Home() {
           <Link
             href={`/conversation/${convo.id}`}
             key={convo.id}
-            className="flex flex-row mt-4"
+            className="flex flex-row mt-4 justify-center items-center"
           >
-            {convo.isActive ? (
-              <div className="h-3 w-3 rounded-full bg-green-400"></div>
-            ) : null}
-            {/* TODO -- next image */}
+            <div
+              className={`h-3 w-3 ${
+                convo.isActive ? 'bg-green-400' : 'bg-transparent'
+              }`}
+            />
             <Image
               alt={`Profile picture for ${fullName}`}
               src="https://images.placeholders.dev/?width=100&height=100"
               width={100}
               height={100}
+              className="ml-2"
             />
-            <div>
-              <div>
-                <p>{fullName}</p>
-                <p>{convo.messageDateTime}</p>
+            <div className="ml-2">
+              <div className="flex flex-row justify-between">
+                <p className="font-bold">{fullName}</p>
+                <p className="font-bold text-gray-500">
+                  {format(parseISO(convo.messageDateTime), 'MMM, dd')}
+                </p>
               </div>
               {/* todo -- cleanup truncation */}
               {/* todo - html stipping */}
