@@ -1,9 +1,69 @@
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useCallback, useState } from 'react';
+import { useAuth } from '../utils/useAuth';
 
 function Login() {
+  // todo - redirect on already logged in
+  const { user, signIn } = useAuth();
+  const router = useRouter();
+  console.log({ user });
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const onUsernameChange = useCallback((e) => {
+    if (!e?.target) return;
+    setUsername(e.target.value);
+  }, []);
+  const onPasswordChange = useCallback((e) => {
+    if (!e?.target) return;
+    setPassword(e.target.value);
+  }, []);
+
+  const handleSignIn = useCallback(() => {
+    signIn(username, password);
+  }, [username, password, signIn]);
+
+  /**
+   * if user already logged in, redirect to home page /
+   */
+  if (user) {
+    console.log('User logged in successfully:', { user });
+    router.push('/');
+  }
+
   return (
-    <main>
-      <h1 className="underline">Login</h1>
+    <main className="flex flex-col flex-1 p-4 w-48 mx-auto">
+      <h1 className="text-4xl font-bold">Login</h1>
+
+      {/* todo -- accessibility of login form */}
+      {/* todo -- formm submission refreshing */}
+      {/* <form onSubmit={handleSignIn} className="flex flex-col w-48 mt-4"> */}
+      <div className="flex flex-col mt-4">
+        <input
+          type="text"
+          onChange={onUsernameChange}
+          value={username}
+          placeholder="Username"
+          className="border px-2 border-black rounded"
+        />
+        <input
+          type="password"
+          onChange={onPasswordChange}
+          value={password}
+          placeholder="Password"
+          className="mt-4 border px-2 border-black rounded"
+        />
+        <button
+          type="button"
+          className="border border-black w-32 mt-4 hover:bg-gray-100"
+          onClick={handleSignIn}
+        >
+          Login
+        </button>
+      </div>
+      {/* </form> */}
+      <p className="mt-4 text-red-700">TODO error message</p>
     </main>
   );
 }
