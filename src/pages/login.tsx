@@ -3,14 +3,14 @@ import React, { useCallback, useState } from 'react';
 import { useAuth } from '../utils/useAuth';
 
 function Login() {
-  // todo - redirect on already logged in
   const { user, signIn } = useAuth();
   const router = useRouter();
-  console.log({ user });
 
+  /**
+   * Form handling hooks here
+   */
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
   const onUsernameChange = useCallback((e) => {
     if (!e?.target) return;
     setUsername(e.target.value);
@@ -20,9 +20,16 @@ function Login() {
     setPassword(e.target.value);
   }, []);
 
-  const handleSignIn = useCallback(() => {
-    signIn(username, password);
-  }, [username, password, signIn]);
+  /**
+   * Fn that actually makes the network request and saves user to store
+   */
+  const handleSignIn = useCallback(
+    (event) => {
+      event.preventDefault();
+      signIn(username, password);
+    },
+    [username, password, signIn],
+  );
 
   /**
    * if user already logged in, redirect to home page /
@@ -37,9 +44,7 @@ function Login() {
       <h1 className="text-4xl font-bold">Login</h1>
 
       {/* todo -- accessibility of login form */}
-      {/* todo -- formm submission refreshing */}
-      {/* <form onSubmit={handleSignIn} className="flex flex-col w-48 mt-4"> */}
-      <div className="flex flex-col mt-4">
+      <form onSubmit={handleSignIn} className="flex flex-col w-48 mt-4">
         <input
           type="text"
           onChange={onUsernameChange}
@@ -55,14 +60,12 @@ function Login() {
           className="mt-4 border px-2 border-black rounded"
         />
         <button
-          type="button"
+          type="submit"
           className="border border-black w-32 mt-4 hover:bg-gray-100"
-          onClick={handleSignIn}
         >
           Login
         </button>
-      </div>
-      {/* </form> */}
+      </form>
       <p className="mt-4 text-red-700">TODO error message</p>
     </main>
   );

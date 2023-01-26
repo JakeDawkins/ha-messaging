@@ -1,27 +1,16 @@
-import React, { useEffect, FC } from 'react';
+import React, { useEffect } from 'react';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import Image from 'next/image';
-import parseISO from 'date-fns/parseISO';
 
 import { useAuth } from '../utils/useAuth';
-import format from 'date-fns/format';
-
-interface Conversation {
-  isActive: boolean;
-  lastName: string;
-  firstName: string;
-  message: string;
-  id: number;
-  messageDateTime: string;
-}
+import { Conversation } from '../types';
+import Layout from '../components/Layout';
+import ConversationComp from '../components/Conversation';
 
 function _Home() {
   const { user } = useAuth();
   const router = useRouter();
-  // doesn't fetch if no user
-  console.log({ user });
+
   const {
     data: conversations,
     isLoading,
@@ -52,45 +41,14 @@ function _Home() {
   }
 
   return (
-    <main className="p-4">
-      <h1 className="text-xl font-bold">Messages</h1>
-      {conversations.map((convo) => {
-        const message = convo.message.replaceAll('<br>', ' ');
-        const fullName = `${convo.firstName} ${convo.lastName}`;
-        return (
-          <Link
-            href={`/conversation/${convo.id}`}
-            key={convo.id}
-            className="flex flex-row mt-4 justify-center items-center"
-          >
-            <div
-              className={`h-3 w-3 ${
-                convo.isActive ? 'bg-green-400' : 'bg-transparent'
-              }`}
-            />
-            <Image
-              alt={`Profile picture for ${fullName}`}
-              src="https://images.placeholders.dev/?width=100&height=100"
-              width={100}
-              height={100}
-              className="ml-2"
-            />
-            <div className="ml-2">
-              <div className="flex flex-row justify-between">
-                <p className="font-bold">{fullName}</p>
-                <p className="font-bold text-gray-500">
-                  {format(parseISO(convo.messageDateTime), 'MMM, dd')}
-                </p>
-              </div>
-              {/* todo -- cleanup truncation */}
-              {/* todo - html stipping */}
-              <p>{message.slice(0, 100)}...</p>
-            </div>
-            <hr />
-          </Link>
-        );
-      })}
-    </main>
+    <Layout>
+      <>
+        <h1 className="text-xl font-bold">Messages</h1>
+        {conversations.map((convo) => {
+          return <ConversationComp key={convo.id} conversation={convo} />;
+        })}
+      </>
+    </Layout>
   );
 }
 

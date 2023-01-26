@@ -3,83 +3,10 @@ import useSwr from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../utils/useAuth';
-import Link from 'next/link';
-import Image from 'next/image';
 import { sendMessage } from '../../utils/fetchers';
-import format from 'date-fns/format';
-import parseISO from 'date-fns/parseISO';
 import { BASE_URL } from '../../utils/constants';
-
-enum SourceEnum {
-  'cp',
-  'c',
-  'admin',
-  'system',
-}
-
-enum RecipientEnum {
-  'cp',
-  'c',
-  'admin',
-  'system',
-}
-
-interface Message {
-  id: number;
-  sourceEnum: SourceEnum;
-  recipientEnum: RecipientEnum;
-  channel: string;
-  message: string;
-  customerId: number;
-  cleanerId: number;
-  messageDateTime: string;
-}
-
-interface MessageResponse {
-  messages: Message[];
-  customerId: string;
-  lastWeekMessageCount: number;
-}
-
-const Message = ({ msg }: { msg: Message }) => {
-  // todo -- proper escaping
-  const content = msg.message.replaceAll('<br>', '\n');
-  // @ts-ignore
-  const isSender = msg.recipientEnum === 'cp';
-  console.log(msg.sourceEnum);
-  return (
-    <div
-      className={`flex flex-row w-4/5 mt-4 ${
-        isSender ? 'self-end' : 'self-start'
-      }`}
-    >
-      {/* This is a bit of a edge case, right now, since the convo
-      on the staging account is cp <> cp */}
-      {msg.sourceEnum === 'c' ? (
-        <Image
-          alt="placeholer avatar"
-          width={48}
-          height={48}
-          src="https://images.placeholders.dev/?width=48&height=48"
-          className="rounded-full mr-4"
-        />
-      ) : null}
-      <div>
-        <p
-          className={`rounded p-2 ${
-            isSender ? 'bg-blue-600 text-white' : 'bg-white border border-black'
-          } p-2`}
-        >
-          {content}
-        </p>
-
-        <p className="self-center">
-          {format(parseISO(msg.messageDateTime), 'h:mm a')}
-        </p>
-      </div>
-    </div>
-  );
-};
+import { MessageResponse } from '../../types';
+import Message from '../../components/Message';
 
 function Conversation() {
   const { user } = useAuth();
@@ -98,31 +25,32 @@ function Conversation() {
   const [inputMessage, setInputMessage] = useState('');
 
   const { trigger: send } = useSWRMutation(SWRKey, sendMessage);
-  const handleMessageSend = useCallback(async () => {
-    // send({ message: inputMessage, customerId });
-    return fetch(`${BASE_URL}/cp/messages/${customerId}/`, {
-      method: 'POST',
-      body: JSON.stringify({ message: inputMessage }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${user.access}`,
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error('invalid response');
-        }
-      })
-      .then(() => {
-        setInputMessage('');
-        mutate();
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  }, [send, inputMessage, customerId]);
+
+  // const handleMessageSend = useCallback(async () => {
+  //   // send({ message: inputMessage, customerId });
+  //   return fetch(`${BASE_URL}/cp/messages/${customerId}/`, {
+  //     method: 'POST',
+  //     body: JSON.stringify({ message: inputMessage }),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${user.access}`,
+  //     },
+  //   })
+  //     .then((res) => {
+  //       if (res.ok) {
+  //         return res.json();
+  //       } else {
+  //         throw new Error('invalid response');
+  //       }
+  //     })
+  //     .then(() => {
+  //       setInputMessage('');
+  //       mutate();
+  //     })
+  //     .catch((e) => {
+  //       console.error(e);
+  //     });
+  // }, [send, inputMessage, customerId]);
 
   // todo pull out to helper
   useEffect(() => {
@@ -152,7 +80,6 @@ function Conversation() {
     );
   }
 
-  console.log(messages);
   return (
     <main className="flex flex-col absolute top-0 bottom-0 left-0 right-0 overflow-hidden">
       {/* todo back button */}
