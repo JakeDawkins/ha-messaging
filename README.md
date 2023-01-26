@@ -41,7 +41,7 @@ This project is based on the following tools:
     - This is just a small assortment of useful TS types for things like `Message`s and
       `Conversation`s
 
-## Running the application locally (preferred)
+## Running the application locally
 
 To run this application, clone this repo and then run the following (requires
 [yarn](https://yarnpkg.com/getting-started/install) to be installed previously):
