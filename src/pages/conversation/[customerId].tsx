@@ -29,6 +29,7 @@ function _Conversation() {
         return { ...data, messages: [...data.messages, res] };
       }),
     );
+    setInputMessage('');
   }, [mutate, user, inputMessage, customerId, data]);
 
   const onInputMessageChange = useCallback((e) => {

@@ -3,9 +3,9 @@
  * TODO - flesh this out a bit
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState, useContext, createContext } from 'react';
-import { BASE_URL } from './constants';
+import { BASE_URL, LOCALSTORAGE_AUTH_KEY } from './constants';
 
 const authContext = createContext(undefined);
 
@@ -31,6 +31,11 @@ export interface AuthUser {
 function useAuthProvider() {
   const [user, setUser] = useState<AuthUser | undefined>(undefined);
 
+  useEffect(() => {
+    // try to fetch the user from local store
+    setUser(JSON.parse(localStorage.getItem(LOCALSTORAGE_AUTH_KEY)));
+  }, []);
+
   // fetch credentials and save the user to state.
   const signIn = (username, password) => {
     return fetch(BASE_URL + '/token/', {
@@ -47,6 +52,10 @@ function useAuthProvider() {
         const loggedInUser = { access, refresh };
         console.log({ loggedInUser });
 
+        localStorage.setItem(
+          LOCALSTORAGE_AUTH_KEY,
+          JSON.stringify(loggedInUser),
+        );
         setUser(loggedInUser);
         return loggedInUser;
       })
@@ -69,6 +78,11 @@ function useAuthProvider() {
         if (!access)
           throw new Error('Failed to refresh token. Invalid token response');
 
+        localStorage.setItem(
+          LOCALSTORAGE_AUTH_KEY,
+          JSON.stringify({ ...user, access }),
+        );
+
         setUser({ ...user, access });
         return user;
       })
@@ -79,6 +93,7 @@ function useAuthProvider() {
   };
 
   const signout = () => {
+    localStorage.removeItem(LOCALSTORAGE_AUTH_KEY);
     setUser(undefined);
   };
 
