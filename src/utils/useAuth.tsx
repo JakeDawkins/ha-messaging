@@ -1,8 +1,3 @@
-/**
- * This is a reusable hook that tracks auth state
- * TODO - flesh this out a bit
- */
-
 import React, { useEffect } from 'react';
 import { useState, useContext, createContext } from 'react';
 import { BASE_URL, LOCALSTORAGE_AUTH_KEY } from './constants';
@@ -27,7 +22,11 @@ export interface AuthUser {
   refresh: string;
 }
 
-// Provider hook that creates auth object and handles state
+/**
+ * This is a reusable hook that tracks auth state. It lives at the top of the
+ * react tree as teh UseAuthProvider provider and allows any child components in
+ * the tree to use the `useAuth` hook to access things like `user`.
+ */
 function useAuthProvider() {
   const [user, setUser] = useState<AuthUser | undefined>(undefined);
 

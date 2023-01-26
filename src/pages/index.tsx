@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import useSwr from 'swr';
-import { useRouter } from 'next/router';
 
 import { useAuth } from '../utils/useAuth';
 import { Conversation } from '../types';
@@ -8,6 +7,9 @@ import Layout from '../components/Layout';
 import ConversationComp from '../components/Conversation';
 import UserBoundary from '../components/UserBoundary';
 
+/**
+ * This is the conversation list view, where each row represents a thread
+ */
 function _Home() {
   const { user } = useAuth();
 

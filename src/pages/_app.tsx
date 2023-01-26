@@ -20,8 +20,6 @@ function AppWithAuth({ children }) {
     <SWRConfig
       value={{
         fetcher: fetchWithUser(refreshAccessToken),
-        // revalidateOnReconnect: false, // offline -> online
-        // revalidateOnFocus: false, // tab switching
       }}
     >
       {children}

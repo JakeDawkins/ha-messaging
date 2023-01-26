@@ -12,9 +12,9 @@ export const fetchWithUser =
         'Content-Type': 'application/json',
         Authorization: `Bearer ${access}`,
       },
-      // in an ideal world, check the response for a header signaling that the
-      // token should be refreshed, then make the refresh call here.
     }).then(async (res) => {
+      // this will fail this request, but SWR will automatically
+      // retry this request and it _should_ pick up the new token
       if (res.status === 401) {
         await refreshToken();
         throw new Error('token expired and refreshed');
@@ -22,11 +22,19 @@ export const fetchWithUser =
       if (res.ok) {
         return res.json();
       } else {
+        // error handling for generic GET requests here
+        // this is pretty simple and not very useful in a real world situation.
+        // You'd definitely want to add error logging here
         throw Error;
       }
     });
   };
 
+/**
+ * GET messages are handled with the default fetcher above, but POST
+ * requests require their own handler, since there is a body involved. This is
+ * the handler for sending a message from the conversation page.
+ */
 export async function sendMessage({
   user,
   customerId,
@@ -43,6 +51,9 @@ export async function sendMessage({
     if (res.ok) {
       return res.json();
     } else {
+      // error handling for generic GET requests here
+      // this is pretty simple and not very useful in a real world situation.
+      // You'd definitely want to add error logging here
       throw Error;
     }
   });

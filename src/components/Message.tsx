@@ -15,8 +15,9 @@ const Message = ({ msg }: { msg: Message }) => {
         isSender ? 'self-end' : 'self-start'
       }`}
     >
-      {/* This is a bit of a edge case, right now, since the convo
-      on the staging account is cp <> cp */}
+      {/* I didn't have time to unwrap this confusion. It looks like the sourceEnum
+      and recipientEnum are different. Also this test user seems to be communicating
+      with another cleaner, so the conversation thread is a bit confusing. */}
       {msg.sourceEnum === 'customer' ? (
         <Image
           alt="placeholer avatar"
